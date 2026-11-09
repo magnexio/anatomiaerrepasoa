@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="eu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cut">
+<meta name="theme-color" content="#1f6f5c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Anatomia errepasoa</title>
+<style>
+  :root {
+    --bg: #f3f1ea;
+    --card: #ffffff;
+    --ink: #1d2422;
+    --muted: #6b7672;
+    --brand: #1f6f5c;
+    --brand-ink: #ffffff;
+    --line: #e2ded3;
+    --ok: #1e9e5a;
+    --ok-bg: #e3f6eb;
+    --bad: #d2463c;
+    --bad-bg: #fbe7e5;
+    --near: #c98a12;
+    --near-bg: #fbf1dc;
+    --shadow: 0 6px 24px rgba(30, 40, 35, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141917;
+      --card: #1e2523;
+      --ink: #eef2f0;
+      --muted: #97a39e;
+      --brand: #3fb08f;
+      --brand-ink: #0f1513;
+      --line: #2e3734;
+      --ok-bg: #173527;
+      --bad-bg: #3a1d1b;
+      --near-bg: #3a2e14;
+      --shadow: none;
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header {
+    display: flex; align-items: center; justify-content: center;
+    padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  }
+  .tabs {
+    display: flex; background: var(--card); border-radius: 999px; padding: 4px;
+    box-shadow: var(--shadow); border: 1px solid var(--line); width: 100%; max-width: 420px;
+  }
+  .tabs button {
+    flex: 1; border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600;
+    padding: 10px 0; border-radius: 999px; cursor: pointer;
+  }
+  .tabs button.on { background: var(--brand); color: var(--brand-ink); }
+  main {
+    flex: 1; display: flex; flex-direction: column; gap: 12px;
+    width: 100%; max-width: 560px; margin: 0 auto; padding: 4px 16px 16px;
+  }
+  .pic {
+    background: #fff; border-radius: 18px; box-shadow: var(--shadow); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center; overflow: hidden;
+    height: 38vh; min-height: 200px; cursor: zoom-in;
+  }
+  .pic img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+  .ask { text-align: center; color: var(--muted); font-size: 15px; margin: 2px 0 0; }
+  form { display: flex; gap: 8px; }
+  input[type=text] {
+    flex: 1; min-width: 0; font: inherit; padding: 14px 16px; border-radius: 14px;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink); outline: none;
+  }
+  input[type=text]:focus { border-color: var(--brand); }
+  .btn {
+    font: inherit; font-weight: 600; border: 0; border-radius: 14px; padding: 14px 18px;
+    background: var(--brand); color: var(--brand-ink); cursor: pointer;
+  }
+  .opts { display: grid; gap: 10px; }
+  .opt {
+    font: inherit; text-align: left; padding: 14px 16px; border-radius: 14px; cursor: pointer;
+    border: 1.5px solid var(--line); background: var(--card); color: var(--ink);
+    display: flex; gap: 12px; align-items: center;
+  }
+  .opt b {
+    flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--bg); color: var(--muted); font-size: 14px;
+  }
+  .opt.ok { border-color: var(--ok); background: var(--ok-bg); }
+  .opt.ok b { background: var(--ok); color: #fff; }
+  .opt.bad { border-color: var(--bad); background: var(--bad-bg); }
+  .opt.bad b { background: var(--bad); color: #fff; }
+  .opt:disabled { cursor: default; }
+  .result {
+    border-radius: 14px; padding: 12px 16px; display: none;
+  }
+  .result.show { display: block; }
+  .result.ok { background: var(--ok-bg); }
+  .result.near { background: var(--near-bg); }
+  .result.bad { background: var(--bad-bg); }
+  .result .tag { font-size: 14px; font-weight: 700; }
+  .result.ok .tag { color: var(--ok); }
+  .result.near .tag { color: var(--near); }
+  .result.bad .tag { color: var(--bad); }
+  .result .answer { font-size: 19px; font-weight: 700; margin-top: 2px; }
+  .next { width: 100%; display: none; }
+  .next.show { display: block; }
+  .zoom {
+    position: fixed; inset: 0; background: rgba(0,0,0,.9); display: none;
+    align-items: center; justify-content: center; z-index: 10; cursor: zoom-out;
+  }
+  .zoom.show { display: flex; }
+  .zoom img { max-width: 100%; max-height: 100%; background: #fff; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <nav class="tabs">
+    <button id="tab-idatzi" class="on">Idatzi</button>
+    <button id="tab-aukeratu">Aukeratu</button>
+  </nav>
+</header>
+
+<main>
+  <div class="pic" id="pic"><img id="img" alt="Egitura anatomikoa"></div>
+  <p class="ask" id="ask">Zein da gezi edo markak adierazten duen egitura?</p>
+
+  <form id="write-form" autocomplete="off">
+    <input type="text" id="write-input" placeholder="Idatzi izen osoa…" autocapitalize="sentences" spellcheck="false">
+    <button class="btn" type="submit">Ados</button>
+  </form>
+
+  <div class="opts" id="opts" hidden></div>
+
+  <div class="result" id="result">
+    <div class="tag" id="result-tag"></div>
+    <div class="answer" id="result-answer"></div>
+  </div>
+  <button class="btn next" id="next">Hurrengoa →</button>
+</main>
+
+<div class="zoom" id="zoom"><img id="zoom-img" alt=""></div>
+
+<script src="data.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  const byId = Object.fromEntries(ITEMS.map(it => [it[0], it]));
+
+  // Testua konparatzeko: minuskulak, azentu gabe, marrak eta parentesiak kenduta
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/\(.*?\)/g, ' ').replace(/[^a-z0-9ñ]+/g, ' ').trim();
+
+  function lev(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++)
+      for (let j = 1; j <= b.length; j++)
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+
+  function grade(text, it) {
+    const t = norm(text);
+    if (!t) return 'bad';
+    let best = Infinity, len = 1;
+    for (const a of [it[2], ...it[3]]) {
+      const n = norm(a), dist = lev(t, n);
+      if (dist < best) { best = dist; len = n.length; }
+    }
+    if (best === 0) return 'ok';
+    if (best <= Math.max(2, Math.round(len * 0.15))) return 'near';
+    return 'bad';
+  }
+
+  const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  // Pila bat modu bakoitzeko: denak agertzen dira errepikatu aurretik
+  const decks = { idatzi: [], aukeratu: [] };
+  function draw(mode) {
+    if (!decks[mode].length) decks[mode] = shuffle(ITEMS.map(it => it[0]));
+    return byId[decks[mode].pop()];
+  }
+
+  function distractors(it) {
+    const firstWord = s => s.split(' ')[0];
+    const pool = [...new Set(ITEMS.map(x => x[2]))].filter(a => a !== it[2]);
+    const scored = shuffle(pool).map(a => {
+      const src = ITEMS.find(x => x[2] === a);
+      return { a, s: (src[1] === it[1] ? 2 : 0) + (firstWord(a) === firstWord(it[2]) ? 1 : 0) + Math.random() };
+    });
+    return scored.sort((x, y) => y.s - x.s).slice(0, 3).map(x => x.a);
+  }
+
+  let mode = 'idatzi', cur = null, answered = false;
+
+  function showResult(kind, it) {
+    const tags = { ok: 'Ondo!', near: 'Ia-ia, horrela idazten da:', bad: 'Erantzun zuzena:' };
+    $('result').className = 'result show ' + kind;
+    $('result-tag').textContent = tags[kind];
+    $('result-answer').textContent = it[2];
+    $('next').classList.add('show');
+    $('next').scrollIntoView({ behavior: 'smooth', block: 'end' });
+    answered = true;
+  }
+
+  function load() {
+    cur = draw(mode);
+    answered = false;
+    // Irudi zaharra ez erakusteko berria kargatu arte
+    $('img').style.visibility = 'hidden';
+    $('img').onload = () => { $('img').style.visibility = 'visible'; };
+    $('img').src = 'img/' + cur[0] + '.jpg';
+    $('result').className = 'result';
+    $('next').classList.remove('show');
+    // Hurrengo irudia aurrez kargatu
+    const peek = decks[mode][decks[mode].length - 1];
+    if (peek) new Image().src = 'img/' + peek + '.jpg';
+
+    if (mode === 'idatzi') {
+      $('write-input').value = '';
+      $('write-input').disabled = false;
+    } else {
+      const opts = shuffle([cur[2], ...distractors(cur)]);
+      $('opts').innerHTML = '';
+      opts.forEach((a, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt';
+        b.innerHTML = '<b>' + 'ABCD'[i] + '</b><span></span>';
+        b.querySelector('span').textContent = a;
+        b.onclick = () => pick(b, a);
+        $('opts').appendChild(b);
+      });
+    }
+  }
+
+  function pick(btn, a) {
+    if (answered) return;
+    const right = a === cur[2];
+    for (const b of $('opts').children) {
+      b.disabled = true;
+      if (b.querySelector('span').textContent === cur[2]) b.classList.add('ok');
+    }
+    if (!right) btn.classList.add('bad');
+    showResult(right ? 'ok' : 'bad', cur);
+  }
+
+  $('write-form').onsubmit = e => {
+    e.preventDefault();
+    if (answered) return load();
+    $('write-input').disabled = true;
+    showResult(grade($('write-input').value, cur), cur);
+    $('next').focus();
+  };
+
+  $('next').onclick = () => {
+    load();
+    window.scrollTo({ top: 0 });
+    if (mode === 'idatzi') $('write-input').focus();
+  };
+
+  function setMode(m) {
+    mode = m;
+    $('tab-idatzi').classList.toggle('on', m === 'idatzi');
+    $('tab-aukeratu').classList.toggle('on', m === 'aukeratu');
+    $('write-form').hidden = m !== 'idatzi';
+    $('opts').hidden = m !== 'aukeratu';
+    load();
+  }
+  $('tab-idatzi').onclick = () => setMode('idatzi');
+  $('tab-aukeratu').onclick = () => setMode('aukeratu');
+
+  $('pic').onclick = () => { $('zoom-img').src = $('img').src; $('zoom').classList.add('show'); };
+  $('zoom').onclick = () => $('zoom').classList.remove('show');
+
+  setMode('idatzi');
+</script>
+</body>
+</html>
