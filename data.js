@@ -61,5 +61,8 @@ const ITEMS = [["g05", "GGA", "Giltzadura esterno-klabikularra", []],
 ["b172a", "BGA", "Aurreko lotailu tibio-astragalinoa", []],
 ["b172b", "BGA", "Lotailu tibio-kalkaneoa", []],
 ["b172c", "BGA", "Atzeko lotailu tibio-astragalinoa", []],
-["b172d", "BGA", "Lotailu deltoideoa", ["Lotailu albokide mediala (deltoideoa)"]]]
-;
+["b172d", "BGA", "Lotailu deltoideoa", ["Lotailu albokide mediala (deltoideoa)"]],
+["b05b", "BGA", "Lotailu sakroespinosoa", ["Lotailu sakroziatikoa", "Lotailu sakroespinosoa (sakroziatikoa)"]],
+["b05c", "BGA", "Lotailu sakrotuberosoa", ["Lotailu sakroiskiatikoa", "Lotailu sakrotuberosoa (sakroiskiatikoa)"]],
+["b06c", "BGA", "Lotailu sakroespinosoa", ["Lotailu sakroziatikoa", "Lotailu sakroespinosoa (sakroziatikoa)"]],
+["b06d", "BGA", "Lotailu sakrotuberosoa", ["Lotailu sakroiskiatikoa", "Lotailu sakrotuberosoa (sakroiskiatikoa)"]]];
